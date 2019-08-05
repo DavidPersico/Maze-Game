@@ -1,18 +1,13 @@
 CXX = g++
+OBJ = player.o maze.o event.o game.o
 
-all: maze
+all: maze clean
+
+maze: $(OBJ) main.cpp
+				$(CXX) -o $@ $^
+
+%.o: %.cpp %.h
+				$(CXX) -c $<
 
 clean:
-	rm Player.o Maze.o Event.o maze
-
-maze: Player.o Maze.o Event.o
-	$(CXX) main.cpp -o maze
-
-Player.o: Player.cpp
-	$(CXX) -c Player.cpp
-
-Maze.o: Maze.cpp
-	$(CXX) -c Maze.cpp
-
-Event.o: Event.cpp
-	$(CXX) -c Event.cpp
+				rm $(OBJ)
