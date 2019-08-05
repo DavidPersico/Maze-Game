@@ -1,4 +1,4 @@
-#include <time.h>       /* time */
+#include <time.h>
 #include <vector>
 #include <iostream>
 
@@ -10,42 +10,64 @@
 void play_game()
 {
   //GAME SETUP
-  std::cout<<"Welcome to: Dave's Maze\nSelect your maze size by entering an integer between 10 and 120\nNote: Larger mazes are more fun/playable\n\n";
-  bool invalid = true;
+  std::cout<< "Welcome to Dave's Maze!\n"
+              "Please enter your desired maze size. It must be between 10 and 120!\n"
+              "You should know that larger mazes are more fun/playable but, may they might not fit your screen.\n\n";
   int choice_size;
   std::cin >> choice_size;
-  if(!std::cin || choice_size <= 9 || choice_size > 120) // 120 is abirtary, a 4k screen should handle at least 200
+  if (!std::cin || choice_size <= 9 || choice_size > 120) // 120 is abirtary, a 4k screen should handle at least 200
   {
-    choice_size = 60; // No time for your error prone BS
-    std::cout<<"Invalid Input: Maze set to size 60. \n";
+    choice_size = 60;
+    std::cout<<"Invalid input...\n Maze set to size 60.\n\n";
   }
+  else
+    std::cout<<"Great. Let's get started!\n\n";
   std::cin.clear();
-  int anything;//press any key to continue
-  std::cout<<"Dave's Maze follows Dave's Rules.\nWASD movement controls:\nw=Up, a=Left, s=Down d=Right\n";
-  std::cout<<"This is you '&' and you have three lives\nYou ('&') can move through '|' and '$' but not through '~' or '='\nPicking up '$' give you points.";
-  std::cout<<"Watch out for these:'*'. They destroy everything in their path! Try moving up to escape the '*'.\n\nAfter reading enter anything to start!\n\n";
-  std::cin >> anything;
-  std::cin.clear();//This prevents infinite loops
-  Player p('p',3,0,0);
 
-  for (int l=1; l <= 12; l++)
+  std::cout<< "Controls:\n"
+              "WASD movement controls:\nW = Up, A = Left, S = Down D = Right\n"
+              "You can make multiple moves at once like this \"SSSD\".\n"
+              "\n"
+              "Rules:\n"
+              "You look like this --> & <--\n"
+              "You've 3 lives to finish 12 levels.\n"
+              "As the '&' you can pass through'|' and '$' but not through '~' or '='.\n"
+              "Moving through a '$' gives you more points.\n"
+              "Watch out for these '*'. They destroy everything in their path!\n"
+              "Hint: Try moving up to escape the '*'.\n"
+              "\n"
+              "After reading, enter anything to start!\n\n";
+  std::cin.get(); /* Press any key to continue */
+
+
+  /* Initialize player and level settings */
+  Player p ('p',3,0,0);
+  bool level_over; /*Level finished check*/
+  std::vector<bool> event_bool;
+  std::vector<int> event_pos;
+  //C++ uses compile time for most stuff, so my monster can't be dynamically allocated
+
+  for (int level = 1; level <= 12; level++)
   {
-    bool level_over = false; //Level Not Over
-    Board maze(choice_size,l,p); //Create GameBoard
 
-    //Initialize coins and enemys
-    std::vector<bool> event_bool;
-    std::vector<int> event_pos; //C++ uses compile time for most stuff, so my monster can't be dynamically allocated
-    event_pos= maze.get_points();
+    Board maze(choice_size, level, p); /* Create GameBoard */
+
+    /* Initialize coins and enemys */
+
+    event_bool.clear();
+    event_pos.clear();
+    event_pos = maze.get_points();
+
     for (int c = 0; c<event_pos.size(); c++){event_bool.push_back(false);}
-    for (int x = 0; x<=6; x++)
+    for (int x = 0; x<=level; x++)
     {
       event_bool.push_back(true);
-      event_pos.push_back((choice_size*choice_size-5)-1-x*l);//space the enemys
+      event_pos.push_back((choice_size*choice_size-5)-1-x*level);//space the enemys
     }
     Event events(event_bool,event_pos);
 
     //PLAY THE GAME
+    level_over = false;
     while(!level_over)
     {
       //do coins/monster interaction
@@ -74,7 +96,7 @@ void play_game()
       //check if they beat this level
       level_over = maze.check_exit(p);
     }
-    std::cout<<"You Passed Level "<<l<<". That's pretty neat!\nYou're awesome!\n";
+    std::cout<<"You Passed Level "<< level <<". That's pretty neat!\nYou're awesome!\n";
   }
   std::cout<<"You Win!!, I can't beleive it!";
 }
