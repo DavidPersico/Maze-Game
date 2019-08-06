@@ -1,6 +1,7 @@
 #include <time.h>
 #include <vector>
 #include <iostream>
+#include <cstdlib>
 
 #include "game.h"
 #include "maze.h"
@@ -9,7 +10,7 @@
 
 void play_game()
 {
-  //GAME SETUP
+  /*** Game setup ***/
   std::cout<< "Welcome to Dave's Maze!\n"
               "Please enter your desired maze size. It must be between 10 and 120!\n"
               "You should know that larger mazes are more fun/playable but, may they might not fit your screen.\n\n";
@@ -38,63 +39,66 @@ void play_game()
               "\n"
               "After reading, enter anything to start!\n\n";
   std::cin.get(); /* Press any key to continue */
+  std::cin.clear();
 
-
-  /* Initialize player and level settings */
+  /* Initialize player and level variables */
   Player p ('p',3,0,0);
-  bool level_over; /*Level finished check*/
+  bool level_won; /* Level finished check */
   std::vector<bool> event_bool;
   std::vector<int> event_pos;
-  //C++ uses compile time for most stuff, so my monster can't be dynamically allocated
+  std::vector<char> moves;
+  char move;
 
   for (int level = 1; level <= 12; level++)
   {
-
-    Board maze(choice_size, level, p); /* Create GameBoard */
-
-    /* Initialize coins and enemys */
-
-    event_bool.clear();
-    event_pos.clear();
+    /* Initialize level with level dependent coins and enemys */
+    Board maze(choice_size, level, p); /* Create board for level*/
     event_pos = maze.get_points();
-
-    for (int c = 0; c<event_pos.size(); c++){event_bool.push_back(false);}
-    for (int x = 0; x<=level; x++)
+    event_bool.clear();
+    for (int c = 0; c < event_pos.size(); c++)
+      event_bool.push_back(false);
+    for (int x = 0; x <= level; x++)
     {
       event_bool.push_back(true);
       event_pos.push_back((choice_size*choice_size-5)-1-x*level);//space the enemys
     }
     Event events(event_bool,event_pos);
 
-    //PLAY THE GAME
-    level_over = false;
-    while(!level_over)
+    /*** Play the game ***/
+    level_won = false;
+    while(!level_won)
     {
-      //do coins/monster interaction
-      events.DoEvent(p, maze);
+      /* Check on coins and move the monster. */
       events.CheckEvent(p, maze);
+      events.DoEvent(p, maze);
 
-      //check if looser
+      /* Check if the game is over. */
       if (p.get_lives()<=-1)
-        std::cout<<"YOU LOSE! TRY AGAIN";
-      //Help people comfortably by telling them what to do
+      {
+        std::cout<<"Sorry, you lost...\nBetter luck next time!";
+        exit(1);
+      }
+
+      /* Message for those with improper window size.  */
       std::cout<<"Adjust your terminal, this line should not be visible!\n";
-      //show Possible moves
-      std::vector<char> moves;
+
+      /* Show possible moves, lives and points. */
       moves = maze.get_moves(p);
       std::cout<<"Possible moves:";
-      for (int m = 0; m<=moves.size();m++){std::cout<<" "<<moves[m];}
-      //show lives and Points
+      for (int m = 0; m <= moves.size(); m++)
+        std::cout<<" "<<moves[m];
       std::cout<<" Lives:"<<p.get_lives()<<" Points:"<< p.get_points()<<"\n";
-      //show updated board
+
+      /* Display the updated maze. */
       maze.print_board();
-      //take in player movement
-      char move;
-      std::cin.clear();
+
+      /* Get player move and move player. */
       std::cin >> move;
+      std::cin.clear();
       maze.move_player(p,move);
-      //check if they beat this level
-      level_over = maze.check_exit(p);
+
+      /* Check if the exit was reached. */
+      level_won = maze.check_exit(p);
     }
     std::cout<<"You Passed Level "<< level <<". That's pretty neat!\nYou're awesome!\n";
   }

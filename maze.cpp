@@ -37,9 +37,9 @@ Board::Board(const int size, const int level, Player& p)
   std::vector<char> Board::get_moves(Player& p)
   {
     std::vector<char> possible_moves;
-    if (p.get_position()-size_ >= 0 && arr_[p.get_position() - size_] != WALL){possible_moves.push_back('w');}
+    if (p.get_position() - size_ >= 0 && arr_[p.get_position() - size_] != WALL){possible_moves.push_back('w');}
     if (p.get_position() - 1 >= 0 && arr_[p.get_position() - 1] != WALL){possible_moves.push_back('a');}
-    if (p.get_position()+size_ < size_*size_ && arr_[p.get_position() + size_] != WALL){possible_moves.push_back('s');}
+    if (p.get_position() + size_ < size_*size_ && arr_[p.get_position() + size_] != WALL){possible_moves.push_back('s');}
     if (p.get_position() + 1 < size_*size_ && arr_[p.get_position() + 1] != WALL) {possible_moves.push_back('d');}
     return possible_moves;
   }
